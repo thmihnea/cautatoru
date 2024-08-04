@@ -1,5 +1,5 @@
-# Prerequisites
 *.d
+# Prerequisites
 
 # Compiled Object files
 *.slo
@@ -30,3 +30,4 @@
 *.exe
 *.out
 *.app
+*.test
