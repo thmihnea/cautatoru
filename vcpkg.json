@@ -5,6 +5,7 @@
     "dependencies": [
       "log4cxx",
       "libxml2",
-      "cpr"
+      "cpr",
+      "nlohmann-json"
     ]
   }

@@ -8,5 +8,6 @@ project(cautatoru)
 find_package(log4cxx CONFIG REQUIRED)
 find_package(LibXml2 CONFIG REQUIRED)
 find_package(cpr CONFIG REQUIRED)
+find_package(nlohmann_json CONFIG REQUIRED)
 
 add_subdirectory(Source)
