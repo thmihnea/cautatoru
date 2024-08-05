@@ -6,6 +6,7 @@
 #include <thread>
 #include <atomic>
 #include <string>
+#include <unordered_map>
 #include "../Store/store.h"
 
 namespace Cautatoru
@@ -29,17 +30,17 @@ namespace Cautatoru
     class RequestManager
     {
     private:
-        std::vector<std::unique_ptr<Store>> m_store_data;
-        std::vector<std::unique_ptr<Cautatoru::ScrapeTask>> m_scrape_tasks;
+        std::vector<std::shared_ptr<Store>> m_store_data;
+        std::unordered_map<std::shared_ptr<Store>, std::shared_ptr<ScrapeTask>> m_scrape_tasks;
         std::vector<std::string> m_scrape_categories;
     public:
         RequestManager();
 
-        std::vector<std::unique_ptr<Store>>& GetStoreData();
+        std::vector<std::shared_ptr<Store>>& GetStoreData();
 
-        std::vector<std::unique_ptr<Cautatoru::ScrapeTask>>& GetScrapeTasks();
+        std::unordered_map<std::shared_ptr<Store>, std::shared_ptr<ScrapeTask>>& GetScrapeTasks();
 
-        std::vector<std::string>& GetScrapeCategories();
+        std::vector<std::string> GetScrapeCategories();
 
         void schedule();
     };

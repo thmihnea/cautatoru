@@ -5,7 +5,7 @@
 
 namespace Cautatoru
 {
-    log4cxx::LoggerPtr GetLogger();
+    log4cxx::LoggerPtr& GetLogger();
 
     void log_info(const std::string& message);
 

@@ -3,6 +3,7 @@ include_directories(Scraper)
 set(SOURCES
     cautatoru.cpp
     logging_manager.cpp
+    Entity/scraped_product.cpp
     Scraper/scraper.cpp
     Store/store.cpp
     Request/request_manager.cpp

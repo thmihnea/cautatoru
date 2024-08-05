@@ -7,6 +7,5 @@
 cpr::Response Cautatoru::Scrape(const std::string& url)
 {
     cpr::Header headers = {{USER_AGENT}};
-    cpr::Response response = cpr::Get(cpr::Url{url}, headers);
-    return response;
+    return cpr::Get(cpr::Url{url}, headers);
 }

@@ -4,7 +4,7 @@
 
 static auto logger_ptr = log4cxx::Logger::getLogger("Cautatoru");
 
-log4cxx::LoggerPtr Cautatoru::GetLogger()
+log4cxx::LoggerPtr& Cautatoru::GetLogger()
 {
     return logger_ptr;
 }
