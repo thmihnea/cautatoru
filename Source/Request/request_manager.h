@@ -32,15 +32,12 @@ namespace Cautatoru
     private:
         std::vector<std::shared_ptr<Store>> m_store_data;
         std::unordered_map<std::shared_ptr<Store>, std::shared_ptr<ScrapeTask>> m_scrape_tasks;
-        std::vector<std::string> m_scrape_categories;
     public:
         RequestManager();
 
         std::vector<std::shared_ptr<Store>>& GetStoreData();
 
         std::unordered_map<std::shared_ptr<Store>, std::shared_ptr<ScrapeTask>>& GetScrapeTasks();
-
-        std::vector<std::string> GetScrapeCategories();
 
         void schedule();
     };

@@ -10,6 +10,7 @@ Cautatoru::Store::Store(const std::string& url)
 {
     this->m_url = url;
     this->m_product_queue = std::queue<std::unique_ptr<Cautatoru::ScrapedProduct>>();
+    this->m_category_queue = std::queue<std::shared_ptr<Cautatoru::Category>>();
 }
 
 std::string& Cautatoru::Store::GetUrl()
@@ -22,6 +23,16 @@ std::queue<std::unique_ptr<Cautatoru::ScrapedProduct>>& Cautatoru::Store::GetPro
     return this->m_product_queue;
 }
 
+std::queue<std::shared_ptr<Cautatoru::Category>>& Cautatoru::Store::GetCategoryQueue()
+{
+    return this->m_category_queue;
+}
+
+void Cautatoru::Store::AddCategory(std::shared_ptr<Cautatoru::Category>& category_ptr)
+{
+    this->m_category_queue.push(category_ptr);
+}
+
 Cautatoru::EMag::EMag() : Store(EMAG_URL) {}
 
 std::string Cautatoru::EMag::RequestUrl(const std::string& item)
@@ -29,7 +40,7 @@ std::string Cautatoru::EMag::RequestUrl(const std::string& item)
     return this->GetUrl() + "/search/" + item + "?ref=effective_search";
 }
 
-void Cautatoru::EMag::scrape(std::vector<std::string>& category)
+void Cautatoru::EMag::scrape()
 {
 
 }

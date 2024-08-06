@@ -9,26 +9,35 @@
 #include "request_manager.h"
 #include "../Scraper/scraper.h"
 #include "../logging_manager.h"
+#include "../Entity/category.h"
 
 Cautatoru::RequestManager::RequestManager()
 {
     this->m_store_data = std::vector<std::shared_ptr<Store>>();
     this->m_scrape_tasks = std::unordered_map<std::shared_ptr<Cautatoru::Store>, std::shared_ptr<Cautatoru::ScrapeTask>>();
-    this->m_scrape_categories = std::vector<std::string>();
 
     this->m_store_data.push_back(
         std::make_shared<EMag>()
     );
 
-    std::ifstream config("../../config.json");
-    nlohmann::json json;
+    std::ifstream config("config.json");
+    if (!config.is_open())
+    {
+        log_error("The config.json file could not be opened. Make sure it exists!");
+        return;
+    }
 
+    nlohmann::json json;
     config >> json;
     auto categories = json["scraped_categories"];
-
-    for (auto &entry : categories)
+    
+    for (auto& cat : categories)
     {
-        this->m_scrape_categories.push_back(entry);
+        auto cat_ptr = std::make_shared<Category>(cat, false);
+        for (auto& store_ptr : this->m_store_data)
+        {
+            store_ptr.get()->AddCategory(cat_ptr);
+        }
     }
 }
 
@@ -42,36 +51,9 @@ std::unordered_map<std::shared_ptr<Cautatoru::Store>, std::shared_ptr<Cautatoru:
     return this->m_scrape_tasks;
 }
 
-std::vector<std::string> Cautatoru::RequestManager::GetScrapeCategories()
-{
-    return this->m_scrape_categories;
-}
-
 void Cautatoru::RequestManager::schedule()
 {
-    for (auto& store_ptr : this->m_store_data)
-    {
-        auto store = *store_ptr.get();
-        auto atomic_ref = std::atomic<bool>(true);
-        auto categories = this->GetScrapeCategories();
-        std::thread execute_scrape([&atomic_ref, &store, categories]{
-            while (atomic_ref)
-            {
-                store.scrape(categories);
-                std::this_thread::sleep_for(std::chrono::seconds(5));
-            }
-        });
-
-        this->m_scrape_tasks[store_ptr] = std::make_shared<ScrapeTask>(
-            std::move(execute_scrape),
-            atomic_ref
-        );
-    }
-
-    for (auto [_, task] : this->m_scrape_tasks)
-    {
-        task.get()->GetThread().join();
-    }
+    
 }
 
 Cautatoru::ScrapeTask::ScrapeTask(std::thread& thread_ptr, std::atomic<bool>& running_ref)

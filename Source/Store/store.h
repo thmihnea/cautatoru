@@ -6,6 +6,7 @@
 #include <memory>
 #include <vector>
 #include "../Entity/scraped_product.h"
+#include "../Entity/category.h"
 
 namespace Cautatoru
 {
@@ -14,6 +15,7 @@ namespace Cautatoru
     private:
         std::string m_url;
         std::queue<std::unique_ptr<ScrapedProduct>> m_product_queue;
+        std::queue<std::shared_ptr<Category>> m_category_queue;
     public:
         Store(const std::string& url);
 
@@ -23,7 +25,11 @@ namespace Cautatoru
 
         std::queue<std::unique_ptr<ScrapedProduct>>& GetProductQueue();
 
-        virtual void scrape(std::vector<std::string>& category) = 0;
+        std::queue<std::shared_ptr<Category>>& GetCategoryQueue();
+
+        void AddCategory(std::shared_ptr<Category>& category_ptr);
+
+        virtual void scrape() = 0;
     };
 
     class EMag : public Store
@@ -33,7 +39,7 @@ namespace Cautatoru
 
         std::string RequestUrl(const std::string& item) override;
 
-        void scrape(std::vector<std::string>& category) override;
+        void scrape() override;
     };
 }
 
