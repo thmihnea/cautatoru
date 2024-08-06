@@ -4,6 +4,7 @@
 #include <iostream>
 #include <fstream>
 #include <unordered_map>
+#include <condition_variable>
 #include "nlohmann/json.hpp"
 #include "../Store/store.h"
 #include "request_manager.h"
@@ -14,13 +15,12 @@
 Cautatoru::RequestManager::RequestManager()
 {
     this->m_store_data = std::vector<std::shared_ptr<Store>>();
-    this->m_scrape_tasks = std::unordered_map<std::shared_ptr<Cautatoru::Store>, std::shared_ptr<Cautatoru::ScrapeTask>>();
 
     this->m_store_data.push_back(
         std::make_shared<EMag>()
     );
 
-    std::ifstream config("config.json");
+    std::ifstream config("../../config.json");
     if (!config.is_open())
     {
         log_error("The config.json file could not be opened. Make sure it exists!");
@@ -46,28 +46,44 @@ std::vector<std::shared_ptr<Cautatoru::Store>>& Cautatoru::RequestManager::GetSt
     return this->m_store_data;
 }
 
-std::unordered_map<std::shared_ptr<Cautatoru::Store>, std::shared_ptr<Cautatoru::ScrapeTask>>& Cautatoru::RequestManager::GetScrapeTasks()
-{
-    return this->m_scrape_tasks;
-}
-
 void Cautatoru::RequestManager::schedule()
 {
-    
-}
 
-Cautatoru::ScrapeTask::ScrapeTask(std::thread& thread_ptr, std::atomic<bool>& running_ref)
-{
-    this->m_thread_ptr = std::move(thread_ptr);
-    this->m_running_ref = std::move(&running_ref);
-}
+    for (auto& store_ptr : this->m_store_data) {
+        auto store = store_ptr.get();
+        auto atomic_ref = std::atomic<bool>(true);
+        
+        std::thread execute_scrape([store, &atomic_ref] {
+            while (atomic_ref) {
+                store->Scrape();
+                std::this_thread::sleep_for(std::chrono::seconds(30));
+            }
+        });
 
-std::thread& Cautatoru::ScrapeTask::GetThread()
-{
-    return this->m_thread_ptr;
-}
+        execute_scrape.detach();
 
-std::atomic<bool>& Cautatoru::ScrapeTask::GetAtomicRef()
-{
-    return this->m_running_ref;
+        store->SetScrapeTask(
+            execute_scrape,
+            atomic_ref
+        );
+    }
+
+    log_info("All threads have been successfully started.");
+
+    std::condition_variable cv;
+    std::mutex cv_m;
+
+    std::unique_lock<std::mutex> lock(cv_m);
+    cv.wait(lock, [this]{
+        auto stores = this->GetStoreData();
+        int stopped_count = 0;
+        for (const auto& store : stores)
+        {
+            if (!store.get()->GetScrapeTask()->GetAtomicRef()->load())
+            {
+                stopped_count++;
+            }
+        }
+        return !(stopped_count == stores.size());
+    });
 }

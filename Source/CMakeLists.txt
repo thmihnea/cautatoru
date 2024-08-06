@@ -5,6 +5,7 @@ set(SOURCES
     logging_manager.cpp
     Entity/scraped_product.cpp
     Entity/category.cpp
+    Entity/scrape_task.cpp
     Scraper/scraper.cpp
     Store/store.cpp
     Request/request_manager.cpp

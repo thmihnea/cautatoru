@@ -28,6 +28,19 @@ std::queue<std::shared_ptr<Cautatoru::Category>>& Cautatoru::Store::GetCategoryQ
     return this->m_category_queue;
 }
 
+Cautatoru::ScrapeTask* Cautatoru::Store::GetScrapeTask()
+{
+    return this->m_scrape_task.get();
+}
+
+void Cautatoru::Store::SetScrapeTask(std::thread& thread_ptr, std::atomic<bool>& atomic_ref)
+{
+    this->m_scrape_task = std::make_unique<ScrapeTask>(
+        thread_ptr,
+        atomic_ref
+    );
+}
+
 void Cautatoru::Store::AddCategory(std::shared_ptr<Cautatoru::Category>& category_ptr)
 {
     this->m_category_queue.push(category_ptr);
@@ -40,7 +53,7 @@ std::string Cautatoru::EMag::RequestUrl(const std::string& item)
     return this->GetUrl() + "/search/" + item + "?ref=effective_search";
 }
 
-void Cautatoru::EMag::scrape()
+void Cautatoru::EMag::Scrape()
 {
 
 }

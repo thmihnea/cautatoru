@@ -7,6 +7,7 @@
 #include <vector>
 #include "../Entity/scraped_product.h"
 #include "../Entity/category.h"
+#include "../Entity/scrape_task.h"
 
 namespace Cautatoru
 {
@@ -19,6 +20,7 @@ namespace Cautatoru
     {
     private:
         std::string m_url;
+        std::unique_ptr<ScrapeTask> m_scrape_task;
         std::queue<std::unique_ptr<ScrapedProduct>> m_product_queue;
         std::queue<std::shared_ptr<Category>> m_category_queue;
     public:
@@ -37,6 +39,24 @@ namespace Cautatoru
          * store URL.
          */
         std::string& GetUrl();
+
+        /**
+         * @brief Returns the current scrape
+         * task object.
+         * 
+         * @return ScrapeTask* The
+         * scrape task object.
+         */
+        ScrapeTask* GetScrapeTask();
+
+        /**
+         * @brief Set the ScrapeTask object which
+         * this Store object owns.
+         * 
+         * @param scrape_task The task
+         * object.
+         */
+        void SetScrapeTask(std::thread& thread_ptr, std::atomic<bool>& atomic_ref);
 
         /**
          * @brief This function generates the specific
@@ -113,7 +133,7 @@ namespace Cautatoru
          * and should be implemented for each individual
          * store, as they have different HTML codes.
          */
-        virtual void scrape() = 0;
+        virtual void Scrape() = 0;
     };
 
     /**
@@ -145,7 +165,7 @@ namespace Cautatoru
          * @brief Initializes the scraping
          * operation for this specific store.
          */
-        void scrape() override;
+        void Scrape() override;
     };
 }
 

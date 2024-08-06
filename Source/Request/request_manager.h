@@ -3,42 +3,48 @@
 
 #include <vector>
 #include <memory>
-#include <thread>
-#include <atomic>
-#include <string>
-#include <unordered_map>
 #include "../Store/store.h"
 
 namespace Cautatoru
 {
-    class ScrapeTask
-    {
-    private:
-        std::thread m_thread_ptr;
-        std::atomic<bool> m_running_ref;
-    public:
-        ScrapeTask(
-            std::thread& thread_ptr,
-            std::atomic<bool>& running_ref
-        );
-
-        std::thread& GetThread();
-
-        std::atomic<bool>& GetAtomicRef();
-    };
-
+    /**
+     * @brief This class is responsible for
+     * managing scrape requests.
+     * 
+     * It holds data regarding the tasks
+     * and the initialized stores.
+     */
     class RequestManager
     {
     private:
         std::vector<std::shared_ptr<Store>> m_store_data;
-        std::unordered_map<std::shared_ptr<Store>, std::shared_ptr<ScrapeTask>> m_scrape_tasks;
     public:
+        /**
+         * @brief Construct a new RequestManager
+         * object.
+         * 
+         * @note This is only used in the main function.
+         * Should not be called twice.
+         */
         RequestManager();
 
+        /**
+         * @brief Returns the vector object holding
+         * the shared pointers of the stores.
+         * 
+         * @note The stores are wrapped inside of
+         * shared pointers because there are multiple
+         * contexts owning them.
+         * 
+         * @return std::vector<std::shared_ptr<Store>>& 
+         * The vector of stores.
+         */
         std::vector<std::shared_ptr<Store>>& GetStoreData();
 
-        std::unordered_map<std::shared_ptr<Store>, std::shared_ptr<ScrapeTask>>& GetScrapeTasks();
-
+        /**
+         * @brief Schedule the scraping operations
+         * within each store.
+         */
         void schedule();
     };
 }

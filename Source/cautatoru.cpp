@@ -24,8 +24,8 @@ int main(int argc, char** argv)
     auto end_time = std::chrono::system_clock::now();
 
     // Calculate the duration in seconds
-    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time).count();
-    Cautatoru::log_info("Application started successfully. This process took " + std::to_string(duration) + "us.");
+    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count();
+    Cautatoru::log_info("Application started successfully. This process took " + std::to_string(duration) + "ms.");
 
     // Schedule.
     request_manager.get()->schedule();
